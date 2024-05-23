@@ -9,9 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
-    // This My empty 9 places, start game
     @State private var moves: [Move?] = Array(repeating: nil, count: 9)
-    @State private var isHumanTurn = true
+    @State private var isGameboardDisable: Bool = false 
     
     var body: some View {
         GeometryReader { geometry in
@@ -35,17 +34,37 @@ struct ContentView: View {
                                 .foregroundStyle(.white)
                         }
                         .onTapGesture {
-                            moves[i] = Move(player: isHumanTurn ? .human : .computer, boardIndex: i)
-                            isHumanTurn.toggle()
+                            if isSquareOccupied(in: moves, forIndex: i) { return }
+                            moves[i] = Move(player: .human, boardIndex: i)
+                            isGameboardDisable = true
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                let computerPosition = determineComputerMovePosition(in: moves)
+                                moves[computerPosition] = Move(player: .computer, boardIndex: computerPosition)
+                                isGameboardDisable = false
+                            }
                         }
-                        
                     }
                 }
                 Spacer()
             }
         }
+        .disabled(isGameboardDisable)
         .padding(8)
     }
+    
+    func isSquareOccupied(in moves: [Move?], forIndex index: Int) -> Bool {
+        return moves.contains(where: { $0?.boardIndex == index })
+    }
+    
+    func determineComputerMovePosition(in moves: [Move?]) -> Int {
+        var movePosition = Int.random(in: 0..<9)
+        while isSquareOccupied(in: moves, forIndex: movePosition) {
+            movePosition = Int.random(in: 0..<9)
+        }
+        return movePosition
+    }
+    
 }
 
 enum Player {
