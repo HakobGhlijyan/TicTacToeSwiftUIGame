@@ -13,7 +13,13 @@ struct GamesView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                Spacer()
+                Spacer(minLength: 20)
+                Text("Tic Tac Toe")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                    .frame(height: 80)
+                Spacer(minLength: 20)
                 LazyVGrid(columns: viewModel.columns, spacing: 4) {
                     ForEach(0..<9) { i in
                         ZStack {
@@ -25,7 +31,7 @@ struct GamesView: View {
                         }
                     }
                 }
-                Spacer()
+                Spacer(minLength: 200)
             }
         }
         .disabled(viewModel.isGameboardDisable)
